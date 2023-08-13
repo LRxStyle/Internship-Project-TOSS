@@ -251,6 +251,44 @@ class _EditDataPageState extends State<EditDataPage> {
     setState(() {});
   }
 
+  Future<void> updateDataInDatabase() async {
+    MySqlConnection connection = await _getConnection();
+
+    try {
+      await connection.query(
+        'UPDATE ssq_data_sor SET '
+            'sor_report_id = ?, '
+            'status_description = ?, '
+            'sor_suggestion = ?, '
+            'sor_root_cause = ?, '
+            'sor_immediate_corrective_action = ? '
+            'WHERE sor_id = ?',
+        [
+          _reportIDController.text,
+          _statusController.text,
+          _suggestionController.text,
+          _rootCauseController.text,
+          _immediateCorrectiveActionController.text,
+          widget.data[0], // ID of the row to update
+        ],
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Data updated successfully')),
+      );
+
+      // Navigate back to the previous screen after successful update
+      Navigator.pop(context);
+    } catch (e) {
+      print('Error updating data: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred while updating data')),
+      );
+    } finally {
+      await connection.close();
+    }
+  }
+
   @override
   void initState() {
     super.initState();

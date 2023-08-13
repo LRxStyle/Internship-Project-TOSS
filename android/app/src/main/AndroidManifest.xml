@@ -2,7 +2,7 @@
     <application
         android:label="demo_input_toss"
         android:name="${applicationName}"
-        android:icon="@mipmap/logo">
+        android:icon="@mipmap/blank">
         <activity
             android:name=".MainActivity"
             android:exported="true"
