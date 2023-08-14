@@ -3,10 +3,10 @@ import 'package:demo_input_toss/TableToss.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:mysql1/mysql1.dart';
 
+// ignore: must_be_immutable
 class EditDataPage extends StatefulWidget {
   final List<String> data;
   String departmentname;
@@ -16,7 +16,7 @@ class EditDataPage extends StatefulWidget {
   String severityname;
   String probabilityname;
 
-  EditDataPage({required this.data,
+  EditDataPage({super.key, required this.data,
     required this.departmentname,
     required  this.buildingname,
     required  this.locationname,
@@ -31,20 +31,37 @@ class EditDataPage extends StatefulWidget {
 
 class _EditDataPageState extends State<EditDataPage> {
   final _formKey = GlobalKey<FormState>();
-  TextEditingController _reportIDController = TextEditingController();
-  TextEditingController _statusController = TextEditingController();
-  TextEditingController _observeDescController = TextEditingController();
-  TextEditingController _dateController = TextEditingController();
-  TextEditingController _departmentController = TextEditingController();
-  TextEditingController _locationBuildingController = TextEditingController();
-  TextEditingController _locationController = TextEditingController();
-  TextEditingController _categoryController =TextEditingController();
-  TextEditingController _severityyController =TextEditingController();
-  TextEditingController _probabilitiesController =TextEditingController();
-  TextEditingController _suggestionController = TextEditingController();
-  TextEditingController _rootCauseController = TextEditingController();
-  TextEditingController _immediateCorrectiveActionController = TextEditingController();
-  TextEditingController _imageController = TextEditingController();
+  final _reportIDController = TextEditingController();
+  final _statusController = TextEditingController();
+  final _observeDescController = TextEditingController();
+  final _dateController = TextEditingController();
+  final _departmentController = TextEditingController();
+  final _locationBuildingController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _categoryController =TextEditingController();
+  final _severityController =TextEditingController();
+  final _probabilitiesController =TextEditingController();
+  final _suggestionController = TextEditingController();
+  final _rootCauseController = TextEditingController();
+  final _immediateCorrectiveActionController = TextEditingController();
+  final _imageController = TextEditingController();
+
+  @override
+  void dispose() {
+    _observeDescController.dispose();
+    _dateController.dispose();
+    _departmentController.dispose();
+    _locationBuildingController.dispose();
+    _locationController.dispose();
+    _categoryController.dispose();
+    _severityController.dispose();
+    _probabilitiesController.dispose();
+    _suggestionController.dispose();
+    _rootCauseController.dispose();
+    _immediateCorrectiveActionController.dispose();
+    _imageController.dispose();
+    super.dispose();
+  }
 
   FilePickerResult? result;
   File? image;
@@ -274,7 +291,7 @@ class _EditDataPageState extends State<EditDataPage> {
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Data updated successfully')),
+        const SnackBar(content: Text('Data updated successfully')),
       );
 
       // Navigate back to the previous screen after successful update
@@ -282,7 +299,7 @@ class _EditDataPageState extends State<EditDataPage> {
     } catch (e) {
       print('Error updating data: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred while updating data')),
+        const SnackBar(content: Text('An error occurred while updating data')),
       );
     } finally {
       await connection.close();
@@ -300,7 +317,7 @@ class _EditDataPageState extends State<EditDataPage> {
     _locationBuildingController.text = widget.buildingname;
     _locationController.text = widget.locationname;
     _categoryController.text = widget.safename;
-    _severityyController.text = widget.severityname;
+    _severityController.text = widget.severityname;
     _probabilitiesController.text = widget.probabilityname;
     _suggestionController.text = widget.data[11];
     _rootCauseController.text = widget.data[12];
@@ -313,7 +330,7 @@ class _EditDataPageState extends State<EditDataPage> {
 
   Widget _buildImagePreview() {
     if (_imageController.text.isNotEmpty) {
-      String imageUrl = 'http://10.0.2.2/upload_image_toss/image_toss/' + _imageController.text;
+      String imageUrl = 'http://10.0.2.2/upload_image_toss/image_toss/${_imageController.text}';
       return Column(
         children: [
           Image.network(
@@ -322,7 +339,7 @@ class _EditDataPageState extends State<EditDataPage> {
         ],
       );
     } else {
-      return Text('No image selected');
+      return const Text('No image selected');
     }
   }
 
@@ -332,14 +349,14 @@ class _EditDataPageState extends State<EditDataPage> {
       bottomNavigationBar: IconButton(
         onPressed: (){
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => TableToss()));
+              context, MaterialPageRoute(builder: (context) => const TableToss()));
         },
-        icon: Icon(Icons.home),
+        icon: const Icon(Icons.home),
       ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Center(
+        title: const Center(
           child: Row(
               children:[
                 Image(
@@ -362,888 +379,906 @@ class _EditDataPageState extends State<EditDataPage> {
       ),
       body: SingleChildScrollView(
         child : Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Form(
-            child: Column(
-              children: [
-                TextFormField(
-                  controller: _reportIDController,
-                  keyboardType: TextInputType.name,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.description),
-                    hintText: 'Report ID',
-                    labelText: 'Report ID',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please fill this field';
-                    }
-                    return null;
-                  },
+            child: Center(
+              child: Stack(
+                children: [
+                Opacity(
+                opacity: 0.3,
+                child: Image.asset(
+                  'assets/splash.png',
+                  width: 500,
+                  height: 680,
+                  fit: BoxFit.cover,
                 ),
-                SizedBox(height: 10,),
-                TextFormField(
-                  controller: _statusController,
-                  keyboardType: TextInputType.name,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.description),
-                    hintText: 'Status',
-                    labelText: 'Status',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please fill this field';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(height: 10,),
-                TextFormField(
-                  controller: _observeDescController,
-                  keyboardType: TextInputType.name,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.description),
-                    hintText: 'Observe Description(Observasi Deskripsi)',
-                    labelText: 'Observe Description',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                  ),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please fill this field';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _dateController,
-                  showCursor: false,
-                  readOnly: true,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.calendar_month),
-                    hintText: 'Date',
-                    labelText: 'Date',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                  ),
-                  onTap: ()
-                  async{
-                    DateTime date = DateTime(1900);
-                    // TimeOfDay time = TimeOfDay.now();
-                    FocusScope.of(context).requestFocus(new FocusNode());
-
-                    date = (await showDatePicker(
-                        context: context,
-                        initialDate:DateTime.now(),
-                        firstDate:DateTime(1900),
-                        lastDate: DateTime(2100)
-                    )
-                    )!;
-
-                    // time = (await showTimePicker(
-                    //     context: context,
-                    //     initialTime: TimeOfDay.now(),
-                    //   )
-                    // )!;
-
-                    // DateTime datetime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
-
-                    datetime = DateTime(date.year, date.month, date.day);
-
-                    // _dateController.text = DateFormat('dd/MM/yyyy hh:mm').format(datetime).toString();},
-                    DateFormat('dd/MM/yyyy').format(datetime);
-                    _dateController.text = DateFormat('dd/MM/yyyy').format(datetime).toString();},
-
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please fill this field';
-                    }
-                    return null;
-                  },
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _departmentController,
-                  keyboardType: TextInputType.text,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _departmentController.text = newValue.toString();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    isDense: true,
-                    prefixIcon: Icon(Icons.location_city),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    suffixIcon: DropdownButtonFormField2(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        border: InputBorder.none,
-                        labelText: 'Department',
-                      ),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _departmentController.text = newValue.toString();
-                        });
-                      },
-                      items: zip(listIDDepartment, dropdownDepartment, (id, text) {
-                        final combinedValue = '$id - $text';
-                        return DropdownMenuItem<int>(
-                          value: id,
-                          child: Text(combinedValue),
-                        );
-                      }).toList(),
-                      dropdownSearchData: DropdownSearchData(
-                        searchController: _departmentController,
-                        searchInnerWidgetHeight: 50,
-                        searchInnerWidget: Container(
-                          height: 50,
-                          padding: const EdgeInsets.only(
-                            top: 8,
-                            bottom: 4,
-                            right: 8,
-                            left: 8,
+              ),
+                  Column(
+                    children: [
+                      TextFormField(
+                        controller: _reportIDController,
+                        keyboardType: TextInputType.name,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.description),
+                          hintText: 'Report ID',
+                          labelText: 'Report ID',
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
                           ),
-                          child: TextFormField(
-                            expands: true,
-                            maxLines: null,
-                            controller: _departmentController,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              hintText: 'Search...',
-                              hintStyle: const TextStyle(fontSize: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
                           ),
                         ),
-                        searchMatchFn: (item, searchValue) {
-                          return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please fill this field';
+                          }
+                          return null;
                         },
                       ),
-                      //This to clear the search value when you close the menu
-                      onMenuStateChange: (isOpen) {
-                        if (!isOpen) {
-                          _departmentController.clear();
-                        }
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please fill this field';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _locationBuildingController,
-                  keyboardType: TextInputType.streetAddress,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _locationBuildingController.text = newValue.toString();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.streetview_outlined),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    suffixIcon: DropdownButtonFormField2(
-                        isExpanded: true,
+                      const SizedBox(height: 10,),
+                      TextFormField(
+                        controller: _statusController,
+                        keyboardType: TextInputType.name,
                         decoration: InputDecoration(
-                          contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
-                          floatingLabelBehavior: FloatingLabelBehavior.auto,
-                          border: InputBorder.none,
-                          labelText: 'Location Building',
+                          prefixIcon: const Icon(Icons.description),
+                          hintText: 'Status',
+                          labelText: 'Status',
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please fill this field';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 10,),
+                      TextFormField(
+                        controller: _observeDescController,
+                        keyboardType: TextInputType.name,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.description),
+                          hintText: 'Observe Description(Observasi Deskripsi)',
+                          labelText: 'Observe Description',
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please fill this field';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _dateController,
+                        showCursor: false,
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.calendar_month),
+                          hintText: 'Date',
+                          labelText: 'Date',
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                        ),
+                        onTap: ()
+                        async{
+                          DateTime date = DateTime(1900);
+                          // TimeOfDay time = TimeOfDay.now();
+                          FocusScope.of(context).requestFocus(new FocusNode());
+
+                          date = (await showDatePicker(
+                              context: context,
+                              initialDate:DateTime.now(),
+                              firstDate:DateTime(1900),
+                              lastDate: DateTime(2100)
+                          )
+                          )!;
+
+                          // time = (await showTimePicker(
+                          //     context: context,
+                          //     initialTime: TimeOfDay.now(),
+                          //   )
+                          // )!;
+
+                          // DateTime datetime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
+
+                          datetime = DateTime(date.year, date.month, date.day);
+
+                          // _dateController.text = DateFormat('dd/MM/yyyy hh:mm').format(datetime).toString();},
+                          DateFormat('dd/MM/yyyy').format(datetime);
+                          _dateController.text = DateFormat('dd/MM/yyyy').format(datetime).toString();},
+
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please fill this field';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _departmentController,
+                        keyboardType: TextInputType.text,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _departmentController.text = newValue.toString();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          isDense: true,
+                          prefixIcon: const Icon(Icons.location_city),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          suffixIcon: DropdownButtonFormField2(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
+                              floatingLabelBehavior: FloatingLabelBehavior.auto,
+                              border: InputBorder.none,
+                              labelText: 'Department',
+                            ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _departmentController.text = newValue.toString();
+                              });
+                            },
+                            items: zip(listIDDepartment, dropdownDepartment, (id, text) {
+                              final combinedValue = '$id - $text';
+                              return DropdownMenuItem<int>(
+                                value: id,
+                                child: Text(combinedValue),
+                              );
+                            }).toList(),
+                            dropdownSearchData: DropdownSearchData(
+                              searchController: _departmentController,
+                              searchInnerWidgetHeight: 50,
+                              searchInnerWidget: Container(
+                                height: 50,
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 4,
+                                  right: 8,
+                                  left: 8,
+                                ),
+                                child: TextFormField(
+                                  expands: true,
+                                  maxLines: null,
+                                  controller: _departmentController,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
+                                    hintText: 'Search...',
+                                    hintStyle: const TextStyle(fontSize: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              searchMatchFn: (item, searchValue) {
+                                return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                              },
+                            ),
+                            //This to clear the search value when you close the menu
+                            onMenuStateChange: (isOpen) {
+                              if (!isOpen) {
+                                _departmentController.clear();
+                              }
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please fill this field';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _locationBuildingController,
+                        keyboardType: TextInputType.streetAddress,
                         onChanged: (newValue) {
                           setState(() {
                             _locationBuildingController.text = newValue.toString();
                           });
                         },
-                        items: dropdownLocationBuildingData.map<DropdownMenuItem<String>>((safe_name) {
-                          return DropdownMenuItem<String>(
-                            value: safe_name,
-                            child: Text(safe_name),
-                          );
-                        }).toList(),
-                        dropdownSearchData: DropdownSearchData(
-                          searchController: _locationBuildingController,
-                          searchInnerWidgetHeight: 50,
-                          searchInnerWidget: Container(
-                            height: 50,
-                            padding: const EdgeInsets.only(
-                              top: 8,
-                              bottom: 4,
-                              right: 8,
-                              left: 8,
-                            ),
-                            child: TextFormField(
-                              expands: true,
-                              maxLines: null,
-                              controller: _locationBuildingController,
-                              decoration: InputDecoration(
-                                isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 8,
-                                ),
-                                hintText: 'Search...',
-                                hintStyle: const TextStyle(fontSize: 12),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.streetview_outlined),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          suffixIcon: DropdownButtonFormField2(
+                              isExpanded: true,
+                              decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
+                                floatingLabelBehavior: FloatingLabelBehavior.auto,
+                                border: InputBorder.none,
+                                labelText: 'Location Building',
                               ),
-                            ),
+                              onChanged: (newValue) {
+                                setState(() {
+                                  _locationBuildingController.text = newValue.toString();
+                                });
+                              },
+                              items: dropdownLocationBuildingData.map<DropdownMenuItem<String>>((safe_name) {
+                                return DropdownMenuItem<String>(
+                                  value: safe_name,
+                                  child: Text(safe_name),
+                                );
+                              }).toList(),
+                              dropdownSearchData: DropdownSearchData(
+                                searchController: _locationBuildingController,
+                                searchInnerWidgetHeight: 50,
+                                searchInnerWidget: Container(
+                                  height: 50,
+                                  padding: const EdgeInsets.only(
+                                    top: 8,
+                                    bottom: 4,
+                                    right: 8,
+                                    left: 8,
+                                  ),
+                                  child: TextFormField(
+                                    expands: true,
+                                    maxLines: null,
+                                    controller: _locationBuildingController,
+                                    decoration: InputDecoration(
+                                      isDense: true,
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 8,
+                                      ),
+                                      hintText: 'Search...',
+                                      hintStyle: const TextStyle(fontSize: 12),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                searchMatchFn: (item, searchValue) {
+                                  return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                                },
+                              ),
+                              //This to clear the search value when you close the menu
+                              onMenuStateChange: (isOpen) {
+                                if (!isOpen) {
+                                  _locationBuildingController.clear();
+                                }
+                              }
                           ),
-                          searchMatchFn: (item, searchValue) {
-                            return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
-                          },
                         ),
-                        //This to clear the search value when you close the menu
-                        onMenuStateChange: (isOpen) {
-                          if (!isOpen) {
-                            _locationBuildingController.clear();
-                          }
-                        }
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _locationController,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.map_outlined),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    suffixIcon: DropdownButtonFormField2<String>(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        border: InputBorder.none,
-                        labelText: 'Location',
                       ),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _locationController.text = newValue!;
-                        });
-                      },
-                      items: zip(listKodeLocation, dropdownLocationData, (id, text) {
-                        final combinedValue = '$id - $text';
-                        return DropdownMenuItem<String>(
-                          value: id,
-                          child: Text(combinedValue),
-                        );
-                      }).toList(),
-                      dropdownSearchData: DropdownSearchData(
-                        searchController: _locationController,
-                        searchInnerWidgetHeight: 50,
-                        searchInnerWidget: Container(
-                          height: 50,
-                          padding: const EdgeInsets.only(
-                            top: 8,
-                            bottom: 4,
-                            right: 8,
-                            left: 8,
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _locationController,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.map_outlined),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
                           ),
-                          child: TextFormField(
-                            expands: true,
-                            maxLines: null,
-                            controller: _locationController,
-                            onChanged: (value) {
-                              // Listen to the text changes and update the _locationController.text accordingly
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          suffixIcon: DropdownButtonFormField2<String>(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
+                              floatingLabelBehavior: FloatingLabelBehavior.auto,
+                              border: InputBorder.none,
+                              labelText: 'Location',
+                            ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _locationController.text = newValue!;
+                              });
                             },
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
+                            items: zip(listKodeLocation, dropdownLocationData, (id, text) {
+                              final combinedValue = '$id - $text';
+                              return DropdownMenuItem<String>(
+                                value: id,
+                                child: Text(combinedValue),
+                              );
+                            }).toList(),
+                            dropdownSearchData: DropdownSearchData(
+                              searchController: _locationController,
+                              searchInnerWidgetHeight: 50,
+                              searchInnerWidget: Container(
+                                height: 50,
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 4,
+                                  right: 8,
+                                  left: 8,
+                                ),
+                                child: TextFormField(
+                                  expands: true,
+                                  maxLines: null,
+                                  controller: _locationController,
+                                  onChanged: (value) {
+                                    // Listen to the text changes and update the _locationController.text accordingly
+                                  },
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
+                                    hintText: 'Search...',
+                                    hintStyle: const TextStyle(fontSize: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
                               ),
-                              hintText: 'Search...',
-                              hintStyle: const TextStyle(fontSize: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                              searchMatchFn: (item, searchValue) {
+                                return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                              },
                             ),
+                            //This to clear the search value when you close the menu
+                            onMenuStateChange: (isOpen) {
+                              if (!isOpen) {
+                                _locationController.clear();
+                              }
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please fill this field';
+                              }
+                              return null;
+                            },
                           ),
                         ),
-                        searchMatchFn: (item, searchValue) {
-                          return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _categoryController,
+                        showCursor: false,
+                        readOnly: true,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _categoryController.text = newValue.toString();
+                          });
                         },
-                      ),
-                      //This to clear the search value when you close the menu
-                      onMenuStateChange: (isOpen) {
-                        if (!isOpen) {
-                          _locationController.clear();
-                        }
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please fill this field';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _categoryController,
-                  showCursor: false,
-                  readOnly: true,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _categoryController.text = newValue.toString();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    prefixIcon: const Icon(Icons.category_outlined),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    suffixIcon: DropdownButtonFormField2(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        border: InputBorder.none,
-                        labelText: 'Category',
-                      ),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _categoryController.text = newValue.toString();
-                        });
-                      },
-                      items: dropdownCategory.map<DropdownMenuItem<String>>((safe_name) {
-                        return DropdownMenuItem<String>(
-                          value: safe_name,
-                          child: Text(safe_name),
-                        );
-                      }).toList(),
-                      dropdownSearchData: DropdownSearchData(
-                        searchController: _categoryController,
-                        searchInnerWidgetHeight: 50,
-                        searchInnerWidget: Container(
-                          height: 50,
-                          padding: const EdgeInsets.only(
-                            top: 8,
-                            bottom: 4,
-                            right: 8,
-                            left: 8,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.category_outlined),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
                           ),
-                          child: TextFormField(
-                            expands: true,
-                            maxLines: null,
-                            controller: _categoryController,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              hintText: 'Search...',
-                              hintStyle: const TextStyle(fontSize: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          suffixIcon: DropdownButtonFormField2(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
+                              floatingLabelBehavior: FloatingLabelBehavior.auto,
+                              border: InputBorder.none,
+                              labelText: 'Category',
                             ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _categoryController.text = newValue.toString();
+                              });
+                            },
+                            items: dropdownCategory.map<DropdownMenuItem<String>>((safe_name) {
+                              return DropdownMenuItem<String>(
+                                value: safe_name,
+                                child: Text(safe_name),
+                              );
+                            }).toList(),
+                            dropdownSearchData: DropdownSearchData(
+                              searchController: _categoryController,
+                              searchInnerWidgetHeight: 50,
+                              searchInnerWidget: Container(
+                                height: 50,
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 4,
+                                  right: 8,
+                                  left: 8,
+                                ),
+                                child: TextFormField(
+                                  expands: true,
+                                  maxLines: null,
+                                  controller: _categoryController,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
+                                    hintText: 'Search...',
+                                    hintStyle: const TextStyle(fontSize: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              searchMatchFn: (item, searchValue) {
+                                return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                              },
+                            ),
+                            //This to clear the search value when you close the menu
+                            onMenuStateChange: (isOpen) {
+                              if (!isOpen) {
+                                _categoryController.clear();
+                              }
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please fill this field';
+                              }
+                              return null;
+                            },
                           ),
                         ),
-                        searchMatchFn: (item, searchValue) {
-                          return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
-                        },
                       ),
-                      //This to clear the search value when you close the menu
-                      onMenuStateChange: (isOpen) {
-                        if (!isOpen) {
-                          _categoryController.clear();
-                        }
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please fill this field';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _severityyController,
-                  showCursor: false,
-                  readOnly: true,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _severityyController.text = newValue.toString();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.warning_amber),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    border: InputBorder.none,
-                    suffixIcon: DropdownButtonFormField2(
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
-                          floatingLabelBehavior: FloatingLabelBehavior.auto,
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _severityController,
+                        showCursor: false,
+                        readOnly: true,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _severityController.text = newValue.toString();
+                          });
+                        },
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.warning_amber),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
                           border: InputBorder.none,
-                          labelText: 'Severity '
-                      ),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _severityyController.text = newValue.toString();
-                        });
-                      },
-                      items: dropdownHazardLevelData.map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      dropdownSearchData: DropdownSearchData(
-                        searchController: _severityyController,
-                        searchInnerWidgetHeight: 50,
-                        searchInnerWidget: Container(
-                          height: 50,
-                          padding: const EdgeInsets.only(
-                            top: 8,
-                            bottom: 4,
-                            right: 8,
-                            left: 8,
-                          ),
-                          child: TextFormField(
-                            expands: true,
-                            maxLines: null,
-                            controller: _severityyController,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              hintText: 'Search...',
-                              hintStyle: const TextStyle(fontSize: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                          suffixIcon: DropdownButtonFormField2(
+                            decoration: const InputDecoration(
+                                contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
+                                floatingLabelBehavior: FloatingLabelBehavior.auto,
+                                border: InputBorder.none,
+                                labelText: 'Severity '
                             ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _severityController.text = newValue.toString();
+                              });
+                            },
+                            items: dropdownHazardLevelData.map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            dropdownSearchData: DropdownSearchData(
+                              searchController: _severityController,
+                              searchInnerWidgetHeight: 50,
+                              searchInnerWidget: Container(
+                                height: 50,
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 4,
+                                  right: 8,
+                                  left: 8,
+                                ),
+                                child: TextFormField(
+                                  expands: true,
+                                  maxLines: null,
+                                  controller: _severityController,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
+                                    hintText: 'Search...',
+                                    hintStyle: const TextStyle(fontSize: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              searchMatchFn: (item, searchValue) {
+                                return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                              },
+                            ),
+                            //This to clear the search value when you close the menu
+                            onMenuStateChange: (isOpen) {
+                              if (!isOpen) {
+                                _severityController.clear();
+                              }
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please fill this field';
+                              }
+                              return null;
+                            },
                           ),
                         ),
-                        searchMatchFn: (item, searchValue) {
-                          return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _probabilitiesController,
+                        showCursor: false,
+                        readOnly: true,
+                        onChanged: (newValue) {
+                          setState(() {
+                            _probabilitiesController.text = newValue.toString();
+                          });
                         },
-                      ),
-                      //This to clear the search value when you close the menu
-                      onMenuStateChange: (isOpen) {
-                        if (!isOpen) {
-                          _severityyController.clear();
-                        }
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please fill this field';
-                        }
-                        return null;
-                      },
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _probabilitiesController,
-                  showCursor: false,
-                  readOnly: true,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _probabilitiesController.text = newValue.toString();
-                    });
-                  },
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.percent),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    border: InputBorder.none,
-                    suffixIcon: DropdownButtonFormField2(
-                      decoration: InputDecoration(
-                        contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
-                        floatingLabelBehavior: FloatingLabelBehavior.auto,
-                        border: InputBorder.none,
-                        labelText: 'Probabilities',
-                      ),
-                      onChanged: (newValue) {
-                        setState(() {
-                          _probabilitiesController.text = newValue.toString();
-                        });
-                      },
-                      items: dropdownHazardProbability.map<DropdownMenuItem<String>>((String value) {
-                        return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text(value),
-                        );
-                      }).toList(),
-                      dropdownSearchData: DropdownSearchData(
-                        searchController: _probabilitiesController,
-                        searchInnerWidgetHeight: 50,
-                        searchInnerWidget: Container(
-                          height: 50,
-                          padding: const EdgeInsets.only(
-                            top: 8,
-                            bottom: 4,
-                            right: 8,
-                            left: 8,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.percent),
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
                           ),
-                          child: TextFormField(
-                            expands: true,
-                            maxLines: null,
-                            controller: _probabilitiesController,
-                            decoration: InputDecoration(
-                              isDense: true,
-                              contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 10,
-                                vertical: 8,
-                              ),
-                              hintText: 'Search...',
-                              hintStyle: const TextStyle(fontSize: 12),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          border: InputBorder.none,
+                          suffixIcon: DropdownButtonFormField2(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
+                              floatingLabelBehavior: FloatingLabelBehavior.auto,
+                              border: InputBorder.none,
+                              labelText: 'Probabilities',
                             ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _probabilitiesController.text = newValue.toString();
+                              });
+                            },
+                            items: dropdownHazardProbability.map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            dropdownSearchData: DropdownSearchData(
+                              searchController: _probabilitiesController,
+                              searchInnerWidgetHeight: 50,
+                              searchInnerWidget: Container(
+                                height: 50,
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 4,
+                                  right: 8,
+                                  left: 8,
+                                ),
+                                child: TextFormField(
+                                  expands: true,
+                                  maxLines: null,
+                                  controller: _probabilitiesController,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
+                                    hintText: 'Search...',
+                                    hintStyle: const TextStyle(fontSize: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              searchMatchFn: (item, searchValue) {
+                                return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                              },
+                            ),
+                            //This to clear the search value when you close the menu
+                            onMenuStateChange: (isOpen) {
+                              if (!isOpen) {
+                                _probabilitiesController.clear();
+                              }
+                            },
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please fill this field';
+                              }
+                              return null;
+                            },
                           ),
                         ),
-                        searchMatchFn: (item, searchValue) {
-                          return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _suggestionController,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.message_outlined),
+                          hintText: 'Suggestion',
+                          labelText: 'Suggestion',
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _rootCauseController,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.question_mark_outlined),
+                          hintText: 'Root Cause',
+                          labelText: 'Root Cause (Penyebab Utama)',
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _immediateCorrectiveActionController,
+                        keyboardType: TextInputType.text,
+                        decoration: InputDecoration(
+                          prefixIcon: const Icon(Icons.construction_outlined),
+                          hintText: 'Immediate Corrective Action',
+                          labelText: 'Immediate Corrective Action (Rencana Perbaikan Segera)',
+                          enabledBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedBorder: const OutlineInputBorder(
+                            borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                            borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          focusedErrorBorder : OutlineInputBorder(
+                            borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                            borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      _buildImagePreview(),
+                      const SizedBox(
+                        height: 10,
+                      ),
+                      TextFormField(
+                        controller: _imageController,
+                        showCursor: false,
+                        readOnly: true,
+                        keyboardType: TextInputType.none,
+                        maxLines: 100,
+                        minLines: 1,
+                        decoration: InputDecoration(
+                            enabledBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                              borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                            ),
+                            focusedBorder: const OutlineInputBorder(
+                              borderSide: BorderSide(width: 2, color: Colors.blueGrey),
+                              borderRadius : BorderRadius.all(Radius.circular(30.0)),
+                            ),
+                            errorBorder: OutlineInputBorder(
+                              borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
+                              borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                            ),
+                            focusedErrorBorder : OutlineInputBorder(
+                              borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
+                              borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                            ),
+                            border: InputBorder.none,
+                            prefixIcon: const Icon(Icons.image_search),
+                            hintText: 'Upload Bukti',
+                            labelText: 'Upload Evidence'),
+                        onTap: (){},
+                      ),
+                      const SizedBox(height: 20,),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: Colors.blue.shade900,
+                            minimumSize: const Size.fromHeight(50)
+                        ),
+                        onPressed: () async {
+                          if (_formKey.currentState!.validate()) {
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Data berhasil diupdate')
+                              ),
+                            );
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => const TableToss()));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text('Tolong datanya dilengkapi')
+                              ),
+                            );
+                          };
                         },
+                        child: const Text('Submit',
+                          style: TextStyle(color: Colors.white,
+                          ),
+                        ),
                       ),
-                      //This to clear the search value when you close the menu
-                      onMenuStateChange: (isOpen) {
-                        if (!isOpen) {
-                          _probabilitiesController.clear();
-                        }
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please fill this field';
-                        }
-                        return null;
-                      },
-                    ),
+                    ],
                   ),
-
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _suggestionController,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.message_outlined),
-                    hintText: 'Suggestion',
-                    labelText: 'Suggestion',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _rootCauseController,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.question_mark_outlined),
-                    hintText: 'Root Cause',
-                    labelText: 'Root Cause (Penyebab Utama)',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _immediateCorrectiveActionController,
-                  keyboardType: TextInputType.text,
-                  decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.construction_outlined),
-                    hintText: 'Immediate Corrective Action',
-                    labelText: 'Immediate Corrective Action (Rencana Perbaikan Segera)',
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                    focusedErrorBorder : OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                      borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                    ),
-                  ),
-                ),
-                SizedBox(
-                  height: 20,
-                ),
-                _buildImagePreview(),
-                SizedBox(
-                  height: 10,
-                ),
-                TextFormField(
-                  controller: _imageController,
-                  showCursor: false,
-                  readOnly: true,
-                  keyboardType: TextInputType.none,
-                  maxLines: 100,
-                  minLines: 1,
-                  decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                        borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 2, color: Colors.blueGrey),
-                        borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                      ),
-                      errorBorder: OutlineInputBorder(
-                        borderSide: BorderSide(width: 1.1, color: Colors.red.shade700),
-                        borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                      ),
-                      focusedErrorBorder : OutlineInputBorder(
-                        borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
-                        borderRadius : const BorderRadius.all(Radius.circular(30.0)),
-                      ),
-                      border: InputBorder.none,
-                      prefixIcon: Icon(Icons.image_search),
-                      hintText: 'Upload Bukti',
-                      labelText: 'Upload Evidence'),
-                  onTap: (){},
-                ),
-                SizedBox(height: 20,),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.blue.shade900,
-                      minimumSize: Size.fromHeight(50)
-                  ),
-                  onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Data berhasil diinput')
-                      ),
-                      );
-                      Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => TableToss()));
-                    } else {
-                      // The form has some validation errors.
-                      // Do Something...
-                    };
-                  },
-                  child: Text('Submit',
-                    style: TextStyle(color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

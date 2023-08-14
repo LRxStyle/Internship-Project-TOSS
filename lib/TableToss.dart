@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 
 class TableToss extends StatefulWidget {
+  const TableToss({super.key});
+
   @override
   _TableTossState createState() => _TableTossState();
 }
@@ -81,7 +83,7 @@ class _TableTossState extends State<TableToss> {
         row['sor_root_cause'].toString(),
         row['sor_immediate_corrective_action'].toString(),
         row['sor_evidence'].toString(),
-        row['created_at'].toLocal().toIso8601String().split(new RegExp(r"[T\.]")).toString(),
+        row['created_at'].toLocal().toIso8601String().split(RegExp(r"[T.]")).toString(),
       ]);
     }
     print('Original Data Rows: $originalDataRows');
@@ -280,100 +282,112 @@ class _TableTossState extends State<TableToss> {
               child :
                 Padding(
                   padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
-                  child: Column(
-                         crossAxisAlignment: CrossAxisAlignment.start,
-                         children: [
-                           DataTable(
-                             columnSpacing: 30,
-                             sortAscending: true,
-                             columns: [
-                               DataColumn(label: Text('Edit or Delete')),
-                               DataColumn(label: Text('ID')),
-                               DataColumn(label: Text('Report ID')),
-                               DataColumn(label: Text('Status')),
-                               DataColumn(label: Text('Observe Description')),
-                               DataColumn(label: Text('Date')),
-                               DataColumn(label: Text('Department')),
-                               DataColumn(label: Text('Location Building')),
-                               DataColumn(label: Text('Location')),
-                               DataColumn(label: Text('Safe Category ID')),
-                               DataColumn(label: Text('Hazard Level')),
-                               DataColumn(label: Text('Hazard Probabilities')),
-                               DataColumn(label: Text('Suggestion')),
-                               DataColumn(label: Text('Root Cause')),
-                               DataColumn(label: Text('Immediate Corrective Action')),
-                               DataColumn(label: Text('Evidence')),
-                               DataColumn(label: Text('Created At')),
-                             ],
-                             rows: dataRows.asMap().entries.map((entry) {
-                               int rowIndex = entry.key;
-                               List<String> row = entry.value;
-                               return DataRow(
-                                 cells: [
-                                   DataCell(Row(
-                                     children: [
-                                       IconButton(
-                                         icon: Icon(Icons.edit),
-                                         onPressed: () async {
-                                           await _editRow(rowIndex);
-                                           Navigator.push(
-                                             context,
-                                             MaterialPageRoute(
-                                               builder: (context) => EditDataPage(
-                                                   data: dataRows[rowIndex],
-                                                   departmentname : departmentname,
-                                                   buildingname : buildingname,
-                                                   locationname : locationname,
-                                                   safename : safename,
-                                                   severityname : severityname,
-                                                   probabilityname : probabilityname,
-                                               ),
-                                             ),
-                                           );
-                                         },
-                                       ),
-                                       IconButton(
-                                         icon: Icon(Icons.delete_forever),
-                                         onPressed: () {
-                                           deleteSelectedRow(rowIndex);
-                                         },
-                                       ),
-                                     ],
-                                   )),
-                                   ...row.map((cell) { return DataCell(Text(cell));
-                                   }).toList(),
+                  child: Stack(
+                      children: [
+                        Opacity(
+                          opacity: 0.3,
+                          child: Image.asset(
+                            'assets/splash.png',
+                            width: 900,
+                            height: 800,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            DataTable(
+                              columnSpacing: 30,
+                              sortAscending: true,
+                              columns: [
+                                   DataColumn(label: Text('Edit or Delete')),
+                                   DataColumn(label: Text('ID')),
+                                   DataColumn(label: Text('Report ID')),
+                                   DataColumn(label: Text('Status')),
+                                   DataColumn(label: Text('Observe Description')),
+                                   DataColumn(label: Text('Date')),
+                                   DataColumn(label: Text('Department')),
+                                   DataColumn(label: Text('Location Building')),
+                                   DataColumn(label: Text('Location')),
+                                   DataColumn(label: Text('Safe Category ID')),
+                                   DataColumn(label: Text('Hazard Level')),
+                                   DataColumn(label: Text('Hazard Probabilities')),
+                                   DataColumn(label: Text('Suggestion')),
+                                   DataColumn(label: Text('Root Cause')),
+                                   DataColumn(label: Text('Immediate Corrective Action')),
+                                   DataColumn(label: Text('Evidence')),
+                                   DataColumn(label: Text('Created At')),
                                  ],
-                               );
-                             }).toList(),
-                           ),
-                           SizedBox(height: 20,),
-                           Row(
-                             children: <Widget>[
-                               FloatingActionButton(
-                                 heroTag: "refreshButton",
-                                 onPressed: () {
-                                   refreshData();
-                                   },
-                                 backgroundColor: Colors.cyan,
-                                 child: const Icon(Icons.refresh),
+                                 rows: dataRows.asMap().entries.map((entry) {
+                                   int rowIndex = entry.key;
+                                   List<String> row = entry.value;
+                                   return DataRow(
+                                     cells: [
+                                       DataCell(Row(
+                                         children: [
+                                           IconButton(
+                                             icon: Icon(Icons.edit),
+                                             onPressed: () async {
+                                               await _editRow(rowIndex);
+                                               Navigator.push(
+                                                 context,
+                                                 MaterialPageRoute(
+                                                   builder: (context) => EditDataPage(
+                                                       data: dataRows[rowIndex],
+                                                       departmentname : departmentname,
+                                                       buildingname : buildingname,
+                                                       locationname : locationname,
+                                                       safename : safename,
+                                                       severityname : severityname,
+                                                       probabilityname : probabilityname,
+                                                   ),
+                                                 ),
+                                               );
+                                             },
+                                           ),
+                                           IconButton(
+                                             icon: Icon(Icons.delete_forever),
+                                             onPressed: () {
+                                               deleteSelectedRow(rowIndex);
+                                             },
+                                           ),
+                                         ],
+                                       )),
+                                       ...row.map((cell) { return DataCell(Text(cell));
+                                       }).toList(),
+                                     ],
+                                   );
+                                 }).toList(),
                                ),
-                               SizedBox(width: 15,),
-                               FloatingActionButton(
-                                 heroTag: "searchButton",
-                                 onPressed: () {
-                                   _showSearchDialog();
-                                 },
-                                 backgroundColor: Colors.green,
-                                 child: const Icon(Icons.search),
+                               SizedBox(height: 20,),
+                               Row(
+                                 children: <Widget>[
+                                   FloatingActionButton(
+                                     heroTag: "refreshButton",
+                                     onPressed: () {
+                                       refreshData();
+                                       },
+                                     backgroundColor: Colors.cyan,
+                                     child: const Icon(Icons.refresh),
+                                   ),
+                                   SizedBox(width: 15,),
+                                   FloatingActionButton(
+                                     heroTag: "searchButton",
+                                     onPressed: () {
+                                       _showSearchDialog();
+                                     },
+                                     backgroundColor: Colors.green,
+                                     child: const Icon(Icons.search),
+                                   ),
+                                 ],
                                ),
-
-                             ],
-                           ),
-                         ],
-                       ),
-                     ),
-                ),
+                          ],
+                        ),
+                      ]
+                  ),
+                )
             ),
+      ),
 
       floatingActionButton: FloatingActionButton(
         heroTag: "addButton",
