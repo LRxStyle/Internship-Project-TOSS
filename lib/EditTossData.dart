@@ -17,7 +17,7 @@ class EditDataPage extends StatefulWidget {
   String probabilityname;
 
   EditDataPage({super.key, required this.data,
-    required this.departmentname,
+    required  this.departmentname,
     required  this.buildingname,
     required  this.locationname,
     required  this.safename,
@@ -48,6 +48,8 @@ class _EditDataPageState extends State<EditDataPage> {
 
   @override
   void dispose() {
+    _reportIDController.dispose();
+    _statusController.dispose();
     _observeDescController.dispose();
     _dateController.dispose();
     _departmentController.dispose();
@@ -74,6 +76,7 @@ class _EditDataPageState extends State<EditDataPage> {
   String? probabilitiesfirst;
   DateTime datetime = DateTime.now();
 
+  List<String> dropdownStatusData = [];
   List<String> dropdownLocationData = [];
   List<String> dropdownLocationBuildingData = [];
   List<String> dropdownHazardLevelData = [];
@@ -93,6 +96,21 @@ class _EditDataPageState extends State<EditDataPage> {
     );
 
     return await MySqlConnection.connect(settings);
+  }
+
+  Future<List<String>> fetchTableStatus() async {
+    MySqlConnection connection = await _getConnection();
+    List<String> statusLists = [];
+
+    var results = await connection.query('SELECT status_description FROM ssq_all_master_status ORDER BY status_id');
+    connection.close();
+
+    for (var row in results) {
+      statusLists.add(row['status_description'].toString());
+    }
+
+    connection.close();
+    return statusLists;
   }
 
   Future<List<String>> fetchTableLocation() async {
@@ -230,6 +248,12 @@ class _EditDataPageState extends State<EditDataPage> {
   }
 
   Future<void> _fetchData() async {
+    fetchTableStatus().then((statusLists) {
+      setState(() {
+        dropdownStatusData = statusLists;
+      });
+    });
+
     fetchTableLocation().then((locationLists) {
       setState(() {
         dropdownLocationData = locationLists;
@@ -268,24 +292,120 @@ class _EditDataPageState extends State<EditDataPage> {
     setState(() {});
   }
 
+  Future getSourceIdFromText<T>(String sourceTable, String columnName, String columnName2, String text) async {
+    final connection  = await _getConnection();
+
+    // Replace 'source_table' and 'text_column' with the actual table name and text column in your source table
+    final sourceTableName = sourceTable;
+    final textColumnName = columnName;
+    final idColumnName = columnName2;
+
+    try {
+      final result = await connection.query(
+        'SELECT * FROM $sourceTableName WHERE $textColumnName = ?',
+        [text],
+      );
+
+      print('SQL Query: SELECT * FROM $sourceTableName WHERE $textColumnName = $text');
+      print('Query Result: $result');
+
+      if (result.isNotEmpty) {
+        return result.first[idColumnName] as T;
+      } else {
+        return -1; // Return a negative value or null to indicate that the text was not found in the source table
+      }
+    } catch (e) {
+      print('Error fetching source data: $e');
+      return -1;
+    } finally {
+      await connection.close();
+    }
+  }
+
   Future<void> updateDataInDatabase() async {
     MySqlConnection connection = await _getConnection();
 
     try {
+      final statusData = await getSourceIdFromText<int>(
+          'ssq_all_master_status',
+          'status_description',
+          'status_id',
+          _statusController.text.toString()
+      );
+
+      final departmentData = await getSourceIdFromText<int>(
+          'ssq_hrga_master_department',
+          'department_id',
+          'department_id',
+          _departmentController.text.toString()
+      );
+
+      final locationBuildingData = await getSourceIdFromText<int>(
+          'ssq_all_master_location_building',
+          'building_name',
+          'building_id',
+          _locationBuildingController.text.toString()
+      );
+
+      final locationData = await getSourceIdFromText<int>(
+          'ssq_all_master_location',
+          'location_kode',
+          'location_id',
+          _locationController.text.toString()
+      );
+
+      final categoryData = await getSourceIdFromText<int>(
+          'ssq_master_safe_category',
+          'safe_name',
+          'safe_id',
+          _categoryController.text.toString()
+      );
+
+      final severityData = await getSourceIdFromText<String>(
+          'ssq_hazard_level',
+          'ket_hazard',
+          'kode_hazard',
+          _severityController.text.toString()
+      );
+
+      final probabilityData = await getSourceIdFromText<String>(
+          'ssq_hazard_probability',
+          'ket_probability',
+          'kode_probability',
+          _probabilitiesController.text.toString()
+      );
       await connection.query(
         'UPDATE ssq_data_sor SET '
             'sor_report_id = ?, '
             'status_description = ?, '
+            'sor_observe_description = ?, '
+            'sor_date = ?, '
+            'sor_department_id = ?, '
+            'sor_location_building_id = ?, '
+            'sor_location_id = ?, '
+            'sor_safe_category_id = ?, '
+            'sor_hazard_level = ?, '
+            'sor_probabilities = ?, '
             'sor_suggestion = ?, '
             'sor_root_cause = ?, '
-            'sor_immediate_corrective_action = ? '
+            'sor_immediate_corrective_action = ?, '
+            'sor_evidence = ? '
             'WHERE sor_id = ?',
         [
           _reportIDController.text,
-          _statusController.text,
+          statusData,
+          _observeDescController.text,
+          _dateController.text,
+          departmentData,
+          locationBuildingData,
+          locationData,
+          categoryData,
+          severityData,
+          probabilityData,
           _suggestionController.text,
           _rootCauseController.text,
           _immediateCorrectiveActionController.text,
+          _imageController.text,
           widget.data[0], // ID of the row to update
         ],
       );
@@ -381,11 +501,12 @@ class _EditDataPageState extends State<EditDataPage> {
         child : Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
+            key: _formKey,
             child: Center(
               child: Stack(
                 children: [
                 Opacity(
-                opacity: 0.3,
+                opacity: 0.15,
                 child: Image.asset(
                   'assets/splash.png',
                   width: 500,
@@ -432,8 +553,6 @@ class _EditDataPageState extends State<EditDataPage> {
                         keyboardType: TextInputType.name,
                         decoration: InputDecoration(
                           prefixIcon: const Icon(Icons.description),
-                          hintText: 'Status',
-                          labelText: 'Status',
                           enabledBorder: const OutlineInputBorder(
                             borderSide: BorderSide(width: 2, color: Colors.blueGrey),
                             borderRadius : BorderRadius.all(Radius.circular(30.0)),
@@ -449,6 +568,64 @@ class _EditDataPageState extends State<EditDataPage> {
                           focusedErrorBorder : OutlineInputBorder(
                             borderSide: BorderSide(width: 2.1, color: Colors.red.shade700),
                             borderRadius : const BorderRadius.all(Radius.circular(30.0)),
+                          ),
+                          suffixIcon: DropdownButtonFormField2(
+                            decoration: const InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB (50, 5, 10, 15),
+                              floatingLabelBehavior: FloatingLabelBehavior.auto,
+                              border: InputBorder.none,
+                              labelText: 'Status',
+                            ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _statusController.text = newValue.toString();
+                              });
+                            },
+                            items: dropdownStatusData.map<DropdownMenuItem<String>>((statusDesc) {
+                              return DropdownMenuItem<String>(
+                                value: statusDesc,
+                                child: Text(statusDesc),
+                              );
+                            }).toList(),
+                            dropdownSearchData: DropdownSearchData(
+                              searchController: _statusController,
+                              searchInnerWidgetHeight: 50,
+                              searchInnerWidget: Container(
+                                height: 50,
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  bottom: 4,
+                                  right: 8,
+                                  left: 8,
+                                ),
+                                child: TextFormField(
+                                  expands: true,
+                                  maxLines: null,
+                                  controller: _statusController,
+                                  decoration: InputDecoration(
+                                    isDense: true,
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      horizontal: 10,
+                                      vertical: 8,
+                                    ),
+                                    hintText: 'Search...',
+                                    hintStyle: const TextStyle(fontSize: 12),
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              searchMatchFn: (item, searchValue) {
+                                return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
+                              },
+                            ),
+                            //This to clear the search value when you close the menu
+                            onMenuStateChange: (isOpen) {
+                              if (!isOpen) {
+                                _statusController.clear();
+                              }
+                            },
                           ),
                         ),
                         validator: (value) {
@@ -1254,7 +1431,7 @@ class _EditDataPageState extends State<EditDataPage> {
                         ),
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
-
+                            updateDataInDatabase();
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Data berhasil diupdate')
@@ -1268,7 +1445,7 @@ class _EditDataPageState extends State<EditDataPage> {
                                   content: Text('Tolong datanya dilengkapi')
                               ),
                             );
-                          };
+                          }
                         },
                         child: const Text('Submit',
                           style: TextStyle(color: Colors.white,

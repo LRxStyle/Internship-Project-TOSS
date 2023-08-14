@@ -506,7 +506,7 @@ class _InputTossDataState extends State<InputTossData> {
                     child: Stack(
                       children: [
                           Opacity(
-                            opacity: 0.3,
+                            opacity: 0.15,
                             child: Image.asset(
                               'assets/splash.png',
                               width: 500,
@@ -655,9 +655,10 @@ class _InputTossDataState extends State<InputTossData> {
                                       });
                                     },
                                     items: zip(listIDDepartment, dropdownDepartment, (id, text) {
+                                      final combinedValue = '$id - $text';
                                       return DropdownMenuItem<int>(
                                         value: id,
-                                        child: Text(text),
+                                        child: Text(combinedValue),
                                       );
                                     }).toList(),
                                     dropdownSearchData: DropdownSearchData(

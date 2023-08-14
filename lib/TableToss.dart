@@ -285,7 +285,7 @@ class _TableTossState extends State<TableToss> {
                   child: Stack(
                       children: [
                         Opacity(
-                          opacity: 0.3,
+                          opacity: 0.15,
                           child: Image.asset(
                             'assets/splash.png',
                             width: 900,
