@@ -344,7 +344,6 @@ class _InputTossDataState extends State<InputTossData> {
   String? severityfirst;
   String? probabilitiesfirst;
   DateTime datetime = DateTime.now();
-  List _images = [];
 
   Future pickImage() async {
     try {
@@ -481,7 +480,7 @@ class _InputTossDataState extends State<InputTossData> {
                 child: Row(
                     children:[
                       Image(
-                        image : AssetImage('assets/logo.jpg'),
+                        image : AssetImage('assets/splash.png'),
                         width : 130,
                         height: 130,
                       ),

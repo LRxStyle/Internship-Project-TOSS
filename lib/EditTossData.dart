@@ -343,7 +343,7 @@ class _EditDataPageState extends State<EditDataPage> {
           child: Row(
               children:[
                 Image(
-                  image : AssetImage('assets/logo.jpg'),
+                  image : AssetImage('assets/splash.png'),
                   width : 130,
                   height: 130,
                 ),

@@ -46,6 +46,7 @@ dependencies:
 
 
 dev_dependencies:
+  flutter_native_splash:
   flutter_test:
     sdk: flutter
 
@@ -65,6 +66,8 @@ flutter:
     - assets/logoPAS.png
     - assets/logo.png
     - assets/logo.jpg
+    - assets/watermark1.png
+    - assets/splash.png
 
 
   # The following line ensures that the Material Icons font is

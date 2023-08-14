@@ -1,0 +1,7 @@
+flutter_native_splash:
+  image: assets/splash.png
+  color: "#FFFFFF"
+  android_disable_fullscreen: true
+  fill : true
+
+#  run on terminal -> dart run flutter_native_splash:create

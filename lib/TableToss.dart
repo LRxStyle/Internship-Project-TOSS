@@ -255,7 +255,7 @@ class _TableTossState extends State<TableToss> {
           child: Row(
               children:[
                 Image(
-                  image : AssetImage('assets/logo.jpg'),
+                  image : AssetImage('assets/splash.png'),
                   width : 130,
                   height: 130,
                 ),
