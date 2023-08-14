@@ -377,7 +377,7 @@ class _EditDataPageState extends State<EditDataPage> {
       await connection.query(
         'UPDATE ssq_data_sor SET '
             'sor_report_id = ?, '
-            'status_description = ?, '
+            'sor_current_status = ?, '
             'sor_observe_description = ?, '
             'sor_date = ?, '
             'sor_department_id = ?, '
@@ -1437,8 +1437,7 @@ class _EditDataPageState extends State<EditDataPage> {
                                 content: Text('Data berhasil diupdate')
                               ),
                             );
-                            Navigator.push(
-                                context, MaterialPageRoute(builder: (context) => const TableToss()));
+                            Navigator.pop(context);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
