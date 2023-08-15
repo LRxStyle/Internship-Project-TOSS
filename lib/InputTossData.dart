@@ -589,14 +589,6 @@ class _InputTossDataState extends State<InputTossData> {
                                   )
                                   )!;
 
-                                  // time = (await showTimePicker(
-                                  //     context: context,
-                                  //     initialTime: TimeOfDay.now(),
-                                  //   )
-                                  // )!;
-
-                                  // DateTime datetime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
-
                                   datetime = DateTime(date.year, date.month, date.day);
 
                                   // _dateController.text = DateFormat('dd/MM/yyyy hh:mm').format(datetime).toString();},

@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:demo_input_toss/EditTossData.dart';
 import 'package:demo_input_toss/InputTossData.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
+import 'package:excel/excel.dart';
+import 'package:path_provider/path_provider.dart';
 
 class TableToss extends StatefulWidget {
   const TableToss({super.key});
@@ -179,31 +182,71 @@ class _TableTossState extends State<TableToss> {
 
   void _performSearch(String query) {
     query = query.trim();
-    originalDataRows = dataRows;;
     setState(() {
-      // Clear the existing data rows
-      dataRows.clear();
-      // Filter the original data rows based on the search query
       if (query.isEmpty) {
-        // If the query is empty, show all original data rows
-        dataRows.addAll(originalDataRows);
+        dataRows = List.from(originalDataRows);
       } else {
-        // Filter data rows based on the search query
-        for (List<String> row in originalDataRows) {
-          print('Row: $row');
-          // Check if any cell contains the search query
-          if (row.any((cell) => cell.toLowerCase().trim().contains(query.toLowerCase().trim()))
-          ) {
-            dataRows.add(row);
-          }
-        }
+        dataRows = originalDataRows.where((row) {
+          return row[0].toLowerCase().contains(query.toLowerCase()); // Only search the first cell (ID)
+        }).toList();
       }
-
-      // Debugging: Print search query and filtered rows
-      print('Search Query: $query');
-      print('Filtered Data Rows: $dataRows');
     });
   }
+
+
+  Future<void> exportToExcel() async {
+    // Get the device's documents directory
+    Directory? documentsDirectory = await getExternalStorageDirectory();
+    if (documentsDirectory != null) {
+      String filePath = '${documentsDirectory.path}/toss_data.xlsx';
+      // Create Excel workbook and sheet
+      var excel = Excel.createExcel();
+      var sheet = excel['TossData'];
+
+      // Add headers to the sheet
+      sheet.appendRow([
+        'ID', 'Report ID', 'Status', 'Observe Description', 'Date',
+        'Department', 'Location Building', 'Location', 'Safe Category ID',
+        'Hazard Level', 'Hazard Probabilities', 'Suggestion', 'Root Cause',
+        'Immediate Corrective Action', 'Evidence', 'Created At'
+      ]);
+
+      // Add data rows to the sheet
+      for (var row in dataRows) {
+        sheet.appendRow(row);
+      }
+
+
+      // Save the Excel file
+      List<int>? excelBytes = excel.encode();
+      if (excelBytes != null) {
+        File excelFile = File(filePath);
+        excelFile.writeAsBytesSync(excelBytes);
+
+
+        // Show a dialog with a download link
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Export Complete'),
+              content: Text('Toss data has been exported to $filePath'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    print('Toss data has been exported to $filePath');
+                  },
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
 
 
   void _showSearchDialog() {
@@ -379,6 +422,15 @@ class _TableTossState extends State<TableToss> {
                                      backgroundColor: Colors.green,
                                      child: const Icon(Icons.search),
                                    ),
+                                   SizedBox(width: 15,),
+                                   FloatingActionButton(
+                                     heroTag: "printExcel",
+                                     onPressed: () {
+                                       exportToExcel();
+                                     },
+                                     backgroundColor: Colors.orange,
+                                     child: const Icon(Icons.file_download),
+                                   )
                                  ],
                                ),
                           ],
