@@ -5,6 +5,7 @@ When I started my internship I solely doing everything alone.
 From the design, the algorithm, constructing communication route with database. 
 Then later on my 2nd week(8 August 2023) I have been told to create 2 more screen(Table Data TOSS & Edit Data TOSS) outside of our agreement.
 
+This app consist of 4 page or screen :
 - Input Data TOSS 
 - Table Data TOSS 
 - Edit Data Toss 
