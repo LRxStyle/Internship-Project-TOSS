@@ -89,6 +89,7 @@ class _TableTossState extends State<TableToss> {
         row['created_at'].toLocal().toIso8601String().split(RegExp(r"[T.]")).toString(),
       ]);
     }
+    originalDataRows=dataRows;
     print('Original Data Rows: $originalDataRows');
     await connection.close();
     setState(() {});
@@ -184,7 +185,7 @@ class _TableTossState extends State<TableToss> {
     query = query.trim();
     setState(() {
       if (query.isEmpty) {
-        dataRows = List.from(originalDataRows);
+        refreshData();
       } else {
         dataRows = originalDataRows.where((row) {
           return row[0].toLowerCase().contains(query.toLowerCase()); // Only search the first cell (ID)
@@ -229,7 +230,7 @@ class _TableTossState extends State<TableToss> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text('Export Complete'),
+              title: const Text('Export Complete'),
               content: Text('Toss data has been exported to $filePath'),
               actions: <Widget>[
                 TextButton(
@@ -237,7 +238,7 @@ class _TableTossState extends State<TableToss> {
                     Navigator.of(context).pop();
                     print('Toss data has been exported to $filePath');
                   },
-                  child: Text('OK'),
+                  child: const Text('OK'),
                 ),
               ],
             );
@@ -254,10 +255,10 @@ class _TableTossState extends State<TableToss> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Search'),
+          title: const Text('Search'),
           content: TextField(
             controller: searchController,
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
               hintText: 'Enter your search query...',
             ),
           ),
@@ -267,14 +268,14 @@ class _TableTossState extends State<TableToss> {
                 _performSearch(searchController.text);
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Search'),
+              child: const Text('Search'),
             ),
             TextButton(
               onPressed: () {
                 searchController.clear();
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
           ],
         );
@@ -289,14 +290,14 @@ class _TableTossState extends State<TableToss> {
       bottomNavigationBar: IconButton(
           onPressed: (){
             Navigator.push(
-                context, MaterialPageRoute(builder: (context) => TableToss()));
+                context, MaterialPageRoute(builder: (context) => const TableToss()));
           },
-          icon: Icon(Icons.home),
+          icon: const Icon(Icons.home),
       ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         centerTitle: true,
-        title: Center(
+        title: const Center(
           child: Row(
               children:[
                 Image(
@@ -317,14 +318,14 @@ class _TableTossState extends State<TableToss> {
         leading: null,
         automaticallyImplyLeading: false,
       ),
-      body: Container(
+      body: SizedBox(
         height: double.infinity,
         width: double.infinity,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child :
                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 15),
+                  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 15),
                   child: Stack(
                       children: [
                         Opacity(
@@ -343,23 +344,23 @@ class _TableTossState extends State<TableToss> {
                               columnSpacing: 30,
                               sortAscending: true,
                               columns: [
-                                   DataColumn(label: Text('Edit or Delete')),
-                                   DataColumn(label: Text('ID')),
-                                   DataColumn(label: Text('Report ID')),
-                                   DataColumn(label: Text('Status')),
-                                   DataColumn(label: Text('Observe Description')),
-                                   DataColumn(label: Text('Date')),
-                                   DataColumn(label: Text('Department')),
-                                   DataColumn(label: Text('Location Building')),
-                                   DataColumn(label: Text('Location')),
-                                   DataColumn(label: Text('Safe Category ID')),
-                                   DataColumn(label: Text('Hazard Level')),
-                                   DataColumn(label: Text('Hazard Probabilities')),
-                                   DataColumn(label: Text('Suggestion')),
-                                   DataColumn(label: Text('Root Cause')),
-                                   DataColumn(label: Text('Immediate Corrective Action')),
-                                   DataColumn(label: Text('Evidence')),
-                                   DataColumn(label: Text('Created At')),
+                                   const DataColumn(label: Text('Edit or Delete')),
+                                   const DataColumn(label: Text('ID')),
+                                   const DataColumn(label: Text('Report ID')),
+                                   const DataColumn(label: Text('Status')),
+                                   const DataColumn(label: Text('Observe Description')),
+                                   const DataColumn(label: Text('Date')),
+                                   const DataColumn(label: Text('Department')),
+                                   const DataColumn(label: Text('Location Building')),
+                                   const DataColumn(label: Text('Location')),
+                                   const DataColumn(label: Text('Safe Category ID')),
+                                   const DataColumn(label: Text('Hazard Level')),
+                                   const DataColumn(label: Text('Hazard Probabilities')),
+                                   const DataColumn(label: Text('Suggestion')),
+                                   const DataColumn(label: Text('Root Cause')),
+                                   const DataColumn(label: Text('Immediate Corrective Action')),
+                                   const DataColumn(label: Text('Evidence')),
+                                   const DataColumn(label: Text('Created At')),
                                  ],
                                  rows: dataRows.asMap().entries.map((entry) {
                                    int rowIndex = entry.key;
@@ -369,7 +370,7 @@ class _TableTossState extends State<TableToss> {
                                        DataCell(Row(
                                          children: [
                                            IconButton(
-                                             icon: Icon(Icons.edit),
+                                             icon: const Icon(Icons.edit),
                                              onPressed: () async {
                                                await _editRow(rowIndex);
                                                Navigator.push(
@@ -389,7 +390,7 @@ class _TableTossState extends State<TableToss> {
                                              },
                                            ),
                                            IconButton(
-                                             icon: Icon(Icons.delete_forever),
+                                             icon: const Icon(Icons.delete_forever),
                                              onPressed: () {
                                                deleteSelectedRow(rowIndex);
                                              },
@@ -402,7 +403,7 @@ class _TableTossState extends State<TableToss> {
                                    );
                                  }).toList(),
                                ),
-                               SizedBox(height: 20,),
+                               const SizedBox(height: 20,),
                                Row(
                                  children: <Widget>[
                                    FloatingActionButton(
@@ -413,7 +414,7 @@ class _TableTossState extends State<TableToss> {
                                      backgroundColor: Colors.cyan,
                                      child: const Icon(Icons.refresh),
                                    ),
-                                   SizedBox(width: 15,),
+                                   const SizedBox(width: 15,),
                                    FloatingActionButton(
                                      heroTag: "searchButton",
                                      onPressed: () {
@@ -422,15 +423,15 @@ class _TableTossState extends State<TableToss> {
                                      backgroundColor: Colors.green,
                                      child: const Icon(Icons.search),
                                    ),
-                                   SizedBox(width: 15,),
-                                   FloatingActionButton(
-                                     heroTag: "printExcel",
-                                     onPressed: () {
-                                       exportToExcel();
-                                     },
-                                     backgroundColor: Colors.orange,
-                                     child: const Icon(Icons.file_download),
-                                   )
+                                   const SizedBox(width: 15,),
+                                   // FloatingActionButton(
+                                   //   heroTag: "printExcel",
+                                   //   onPressed: () {
+                                   //     exportToExcel();
+                                   //   },
+                                   //   backgroundColor: Colors.orange,
+                                   //   child: const Icon(Icons.file_download),
+                                   // )
                                  ],
                                ),
                           ],
@@ -445,7 +446,7 @@ class _TableTossState extends State<TableToss> {
         heroTag: "addButton",
         onPressed: () {
           Navigator.push(
-              context, MaterialPageRoute(builder: (context) => InputTossData()));
+              context, MaterialPageRoute(builder: (context) => const InputTossData()));
         },
         backgroundColor: Colors.cyan,
         child: const Icon(Icons.add),
