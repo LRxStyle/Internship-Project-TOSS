@@ -398,42 +398,6 @@ class _InputTossDataState extends State<InputTossData> {
     }
   }
 
-  // Future<void> getImageServer() async {
-  //   late http.IOClient ioClient;
-  //
-  //   try {
-  //     ioClient = http.IOClient(
-  //       HttpClient()..badCertificateCallback = (cert, host, port) => true,
-  //     );
-  //
-  //     final response = await ioClient.get(Uri.parse('https://10.0.2.2/upload_image_toss/list.php'));
-  //
-  //     if (response.statusCode == 200) {
-  //       if (response.body.isNotEmpty) {
-  //         final data = jsonDecode(response.body);
-  //         setState(() {
-  //           _images = data;
-  //         });
-  //
-  //         // Print the response body only once
-  //         print('Get Image Server Response:');
-  //         print(response.body);
-  //       } else {
-  //         print('Response body is empty.');
-  //       }
-  //     } else {
-  //       print('Request failed with status: ${response.statusCode}');
-  //     }
-  //   } catch (e) {
-  //     print('Error: $e');
-  //   } finally {
-  //     if (ioClient != null) {
-  //       ioClient.close();
-  //     }
-  //   }
-  // }
-
-
   Widget _buildImagePreview() {
     if (_imageController.text.isNotEmpty) {
       File image = File(_imagePath);

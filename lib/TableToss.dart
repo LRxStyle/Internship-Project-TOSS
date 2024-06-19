@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:demo_input_toss/DeletedDataPage.dart';
 import 'package:demo_input_toss/EditTossData.dart';
 import 'package:demo_input_toss/InputTossData.dart';
 import 'package:flutter/material.dart';
@@ -46,13 +47,52 @@ class _TableTossState extends State<TableToss> {
     MySqlConnection connection = await _getConnection();
     int idToDelete = int.parse(dataRows[rowIndex][0]); // Assuming ID is in the first column
 
-    await connection.query('DELETE FROM ssq_data_sor WHERE sor_id = ?', [idToDelete]);
+    // Fetch the row data to be deleted
+    var result = await connection.query(
+        'SELECT * FROM ssq_data_sor WHERE sor_id = ?',
+        [idToDelete]
+    );
+
+    if (result.isNotEmpty) {
+      var row = result.first;
+      await connection.query(
+          'INSERT INTO deleted_sor_data (sor_id, sor_report_id, sor_observe_description, sor_date, sor_department_id, '
+              'sor_location_building_id, sor_location_id, sor_safe_category_id, sor_hazard_level, sor_probabilities, '
+              'sor_suggestion, sor_root_cause, sor_immediate_corrective_action, sor_evidence, created_at, deleted_at) '
+              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [
+            row['sor_id'],
+            row['sor_report_id'],
+            row['sor_observe_description'],
+            row['sor_date'].toUtc(),
+            row['sor_department_id'],
+            row['sor_location_building_id'],
+            row['sor_location_id'],
+            row['sor_safe_category_id'],
+            row['sor_hazard_level'],
+            row['sor_probabilities'],
+            row['sor_suggestion'],
+            row['sor_root_cause'],
+            row['sor_immediate_corrective_action'],
+            row['sor_evidence'],
+            row['created_at'].toUtc(),
+            DateTime.now().toUtc()
+          ]
+      );
+
+      await connection.query(
+          'DELETE FROM ssq_data_sor WHERE sor_id = ?',
+          [idToDelete]
+      );
+
+      setState(() {
+        dataRows.removeAt(rowIndex);
+      });
+    }
 
     await connection.close();
-    setState(() {
-      dataRows.removeAt(rowIndex);
-    });
   }
+
 
 
   Future<void> fetchDataFromDatabase() async {
@@ -259,7 +299,7 @@ class _TableTossState extends State<TableToss> {
           content: TextField(
             controller: searchController,
             decoration: const InputDecoration(
-              hintText: 'Enter your search query...',
+              hintText: 'Masukkan ID laporan TOSS...',
             ),
           ),
           actions: <Widget>[
@@ -424,14 +464,26 @@ class _TableTossState extends State<TableToss> {
                                      child: const Icon(Icons.search),
                                    ),
                                    const SizedBox(width: 15,),
-                                   // FloatingActionButton(
-                                   //   heroTag: "printExcel",
-                                   //   onPressed: () {
-                                   //     exportToExcel();
-                                   //   },
-                                   //   backgroundColor: Colors.orange,
-                                   //   child: const Icon(Icons.file_download),
-                                   // )
+                                   FloatingActionButton(
+                                     heroTag: "printExcel",
+                                     onPressed: () {
+                                       exportToExcel();
+                                     },
+                                     backgroundColor: Colors.orange,
+                                     child: const Icon(Icons.file_download),
+                                   ),
+                                   const SizedBox(width: 15,),
+                                   FloatingActionButton(
+                                     heroTag: "goToDeletedPage",
+                                     onPressed: () {
+                                       Navigator.push(
+                                         context,
+                                         MaterialPageRoute(builder: (context) => const DeletedDataPage()),
+                                       );
+                                     },
+                                     backgroundColor: Colors.greenAccent,
+                                     child: const Icon(Icons.restore_from_trash_outlined),
+                                   )
                                  ],
                                ),
                           ],
