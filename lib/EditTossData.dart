@@ -374,7 +374,8 @@ class _EditDataPageState extends State<EditDataPage> {
           'kode_probability',
           _probabilitiesController.text.toString()
       );
-      await connection.query(
+
+      final result = await connection.query(
         'UPDATE ssq_data_sor SET '
             'sor_report_id = ?, '
             'sor_current_status = ?, '
@@ -395,7 +396,7 @@ class _EditDataPageState extends State<EditDataPage> {
           _reportIDController.text,
           statusData,
           _observeDescController.text,
-          _dateController.text,
+          datetime.toLocal().toIso8601String().split('T').first,
           departmentData,
           locationBuildingData,
           locationData,
@@ -410,21 +411,31 @@ class _EditDataPageState extends State<EditDataPage> {
         ],
       );
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Data updated successfully')),
-      );
-
-      // Navigate back to the previous screen after successful update
-      Navigator.pop(context);
+      if (mounted) {
+        if (result != null && result.affectedRows != null && result.affectedRows! > 0) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Data updated successfully')),
+          );
+          // Navigate back to the previous screen after successful update
+          Navigator.pop(context);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No data was updated')),
+          );
+        }
+      }
     } catch (e) {
-      print('Error updating data: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('An error occurred while updating data')),
-      );
+      if (mounted) {
+        print('Error updating data: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('An error occurred while updating data')),
+        );
+      }
     } finally {
       await connection.close();
     }
   }
+
 
   @override
   void initState() {
@@ -697,29 +708,18 @@ class _EditDataPageState extends State<EditDataPage> {
                         ),
                         onTap: ()
                         async{
-                          DateTime date = DateTime(1900);
-                          // TimeOfDay time = TimeOfDay.now();
+                          DateTime date = DateTime.now();
                           FocusScope.of(context).requestFocus(new FocusNode());
 
                           date = (await showDatePicker(
                               context: context,
                               initialDate:DateTime.now(),
                               firstDate:DateTime(1900),
-                              lastDate: DateTime(2100)
-                          )
+                              lastDate: DateTime(2100))
                           )!;
-
-                          // time = (await showTimePicker(
-                          //     context: context,
-                          //     initialTime: TimeOfDay.now(),
-                          //   )
-                          // )!;
-
-                          // DateTime datetime = DateTime(date.year, date.month, date.day, time.hour, time.minute);
 
                           datetime = DateTime(date.year, date.month, date.day);
 
-                          // _dateController.text = DateFormat('dd/MM/yyyy hh:mm').format(datetime).toString();},
                           DateFormat('dd/MM/yyyy').format(datetime);
                           _dateController.text = DateFormat('dd/MM/yyyy').format(datetime).toString();},
 
@@ -1432,12 +1432,6 @@ class _EditDataPageState extends State<EditDataPage> {
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             updateDataInDatabase();
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Data berhasil diupdate')
-                              ),
-                            );
-                            Navigator.pop(context);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(

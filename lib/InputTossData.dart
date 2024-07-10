@@ -294,10 +294,14 @@ class _InputTossDataState extends State<InputTossData> {
       final String currentMonth = '${now.month.toString().padLeft(2, '0')}';
       final String currentYear = now.year.toString();
 
-      final Results existingRecords = await connection.query('SELECT COUNT(*) AS count FROM ssq_data_sor');
+      final Results existingRecords = await connection.query(
+        'SELECT COUNT(*) AS count FROM ssq_data_sor WHERE MONTH(sor_date) = ? AND YEAR(sor_date) = ?',
+        [now.month, now.year],
+      );
       final int nextAutoIncrement = existingRecords.first['count'] + 1;
+      final String formattedReportNumber = nextAutoIncrement.toString().padLeft(3, '0');
 
-      final String formattedTaskName = 'TOSS/${nextAutoIncrement.toString().padLeft(3, '0')}/$currentMonth/$currentYear';
+      final String formattedTaskName = 'TOSS/$formattedReportNumber/$currentMonth/$currentYear';
       await connection.query('INSERT INTO ssq_data_sor (sor_observe_description, sor_date, sor_department_id, sor_location_building_id, sor_location_id, sor_safe_category_id, sor_hazard_level, sor_probabilities, sor_suggestion, sor_root_cause, sor_immediate_corrective_action, sor_evidence, created_at, sor_report_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           data1,
