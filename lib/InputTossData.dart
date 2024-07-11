@@ -274,19 +274,35 @@ class _InputTossDataState extends State<InputTossData> {
     }
   }
 
-  Future<void> sendDataToDatabase(
-      String data1,
-      DateTime data2,
-      int data3,
-      int data4,
-      int data5,
-      int data6,
-      String data7,
-      String data8,
-      String data9,
-      String data10,
-      String data11,
-      String data12) async {
+  Future<String?> generateImageFormatName() async {
+    MySqlConnection connection = await _getConnection();
+
+    try {
+      final DateTime now = DateTime.now();
+      final String currentMonth = '${now.month.toString().padLeft(2, '0')}';
+      final String currentYear = now.year.toString();
+
+      final Results existingRecords = await connection.query(
+        'SELECT COUNT(*) AS count FROM ssq_data_sor WHERE MONTH(sor_date) = ? AND YEAR(sor_date) = ?',
+        [now.month, now.year],
+      );
+      final int nextAutoIncrement = existingRecords.first['count'] + 1;
+      final String formattedReportNumber = nextAutoIncrement.toString().padLeft(3, '0');
+
+      final String formattedTaskName = 'TOSS$formattedReportNumber$currentMonth$currentYear';
+
+      final String sor_evidence = 'sor_evidence_$formattedTaskName';
+
+      return sor_evidence;
+    } catch (e) {
+      print('Error generating format name: $e');
+      return null;
+    } finally {
+      await connection.close();
+    }
+  }
+
+  Future<String?> generateReportFormatName() async {
     MySqlConnection connection = await _getConnection();
 
     try {
@@ -302,6 +318,38 @@ class _InputTossDataState extends State<InputTossData> {
       final String formattedReportNumber = nextAutoIncrement.toString().padLeft(3, '0');
 
       final String formattedTaskName = 'TOSS/$formattedReportNumber/$currentMonth/$currentYear';
+
+      return formattedTaskName;
+    } catch (e) {
+      print('Error generating format name: $e');
+      return null;
+    } finally {
+      await connection.close();
+    }
+  }
+
+  Future<void> sendDataToDatabase(
+      String data1,
+      DateTime data2,
+      int data3,
+      int data4,
+      int data5,
+      int data6,
+      String data7,
+      String data8,
+      String data9,
+      String data10,
+      String data11,
+      String data12) async {
+    MySqlConnection connection = await _getConnection();
+
+    String? reportName = await generateReportFormatName();
+
+    if (reportName == null) {
+      throw Exception('Failed to generate report name');
+    }
+
+    try {
       await connection.query('INSERT INTO ssq_data_sor (sor_observe_description, sor_date, sor_department_id, sor_location_building_id, sor_location_id, sor_safe_category_id, sor_hazard_level, sor_probabilities, sor_suggestion, sor_root_cause, sor_immediate_corrective_action, sor_evidence, created_at, sor_report_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           data1,
@@ -317,11 +365,21 @@ class _InputTossDataState extends State<InputTossData> {
           data11,
           data12,
           DateTime.now().toLocal().toIso8601String(),
-          formattedTaskName,
+          reportName,
         ],);
       print('Data sent successfully!');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Data berhasil diinput')
+        ),
+      );
     } catch (e) {
       print('Error: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Data gagal diinput')
+        ),
+      );
     } finally {
       await connection.close();
     }
@@ -333,38 +391,51 @@ class _InputTossDataState extends State<InputTossData> {
     _fetchData();
     _fetchKodeLocation();
     _fetchIDDepartment();
-    // getImageServer();
   }
 
   FilePickerResult? result;
   String _imagePath = "";
   File? image;
-  // String? departmentfirst;
   int? departmentIDfirst;
   String? locationbuildingfirst;
-  // String? locationfirst;
   String? locationIDfirst;
   String? categoryfirst;
   String? severityfirst;
   String? probabilitiesfirst;
   DateTime datetime = DateTime.now();
 
-  Future pickImage() async {
+  Future<void> pickImage() async {
     try {
       final image = await ImagePicker().pickImage(source: ImageSource.gallery);
-      if(image == null) return;
-      final imageTemp = File(image.path);
-      setState(() => this.image = imageTemp);
-      _imageController.text = image.name;
-      _imagePath = image.path;
-    } on PlatformException catch(e) {
+      if (image == null) return;
+
+      String? sor_evidence = await generateImageFormatName();
+      if (sor_evidence == null) {
+        throw Exception('Failed to generate sor_evidence filename');
+      }
+
+      final String extension = image.path.split('.').last;
+      final String newImagePath = '${image.path.replaceAll(RegExp(r'[^\/]+$'), '')}$sor_evidence.$extension';
+
+      final File renamedImage = await File(image.path).rename(newImagePath);
+
+      setState(() {
+        this.image = renamedImage;
+        _imagePath = renamedImage.path;
+      });
+
+      _imageController.text = '$sor_evidence.$extension';
+
+    } on PlatformException catch (e) {
       _imageController.text = 'Failed to pick image: $e';
+    } catch (e) {
+      _imageController.text = 'Failed: $e';
     }
   }
 
   Future<void> sendImage() async {
     var img = image;
-    var uri = "https://10.0.2.2/upload_image_toss/create.php"; // Remove extra slashes
+    var uri = "http://10.0.2.2/upload_image_toss/create.php";
     var request = http.MultipartRequest('POST', Uri.parse(uri));
 
     if (img != null) {
@@ -546,7 +617,6 @@ class _InputTossDataState extends State<InputTossData> {
                                 onTap: ()
                                 async{
                                   DateTime date = DateTime(1900);
-                                  // TimeOfDay time = TimeOfDay.now();
                                   FocusScope.of(context).requestFocus(new FocusNode());
 
                                   date = (await showDatePicker(
@@ -559,7 +629,6 @@ class _InputTossDataState extends State<InputTossData> {
 
                                   datetime = DateTime(date.year, date.month, date.day);
 
-                                  // _dateController.text = DateFormat('dd/MM/yyyy hh:mm').format(datetime).toString();},
                                   DateFormat('dd/MM/yyyy').format(datetime);
                                   _dateController.text = DateFormat('dd/MM/yyyy').format(datetime).toString();},
 
@@ -654,7 +723,6 @@ class _InputTossDataState extends State<InputTossData> {
                                         return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
                                       },
                                     ),
-                                    //This to clear the search value when you close the menu
                                     onMenuStateChange: (isOpen) {
                                       if (!isOpen) {
                                         _departmentController.clear();
@@ -753,7 +821,6 @@ class _InputTossDataState extends State<InputTossData> {
                                           return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
                                         },
                                       ),
-                                      //This to clear the search value when you close the menu
                                       onMenuStateChange: (isOpen) {
                                         if (!isOpen) {
                                           _locationBuildingController.clear();
@@ -823,7 +890,6 @@ class _InputTossDataState extends State<InputTossData> {
                                           maxLines: null,
                                           controller: _locationController,
                                           onChanged: (value) {
-                                            // Listen to the text changes and update the _locationController.text accordingly
                                           },
                                           decoration: InputDecoration(
                                             isDense: true,
@@ -843,7 +909,6 @@ class _InputTossDataState extends State<InputTossData> {
                                         return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
                                       },
                                     ),
-                                    //This to clear the search value when you close the menu
                                     onMenuStateChange: (isOpen) {
                                       if (!isOpen) {
                                         _locationController.clear();
@@ -942,7 +1007,6 @@ class _InputTossDataState extends State<InputTossData> {
                                         return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
                                       },
                                     ),
-                                    //This to clear the search value when you close the menu
                                     onMenuStateChange: (isOpen) {
                                       if (!isOpen) {
                                         _categoryController.clear();
@@ -1042,7 +1106,6 @@ class _InputTossDataState extends State<InputTossData> {
                                         return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
                                       },
                                     ),
-                                    //This to clear the search value when you close the menu
                                     onMenuStateChange: (isOpen) {
                                       if (!isOpen) {
                                         _severityyController.clear();
@@ -1142,7 +1205,6 @@ class _InputTossDataState extends State<InputTossData> {
                                         return item.value.toString().contains(searchValue) || item.value.toString().toLowerCase().contains(searchValue) || item.value.toString().toUpperCase().contains(searchValue);
                                       },
                                     ),
-                                    //This to clear the search value when you close the menu
                                     onMenuStateChange: (isOpen) {
                                       if (!isOpen) {
                                         _probabilitiesController.clear();
@@ -1332,13 +1394,8 @@ class _InputTossDataState extends State<InputTossData> {
                                         _probabilitiesController.text.toString()
                                     );
 
-                                    sendDataToDatabase(_observeDescController.text, datetime, departmentData, locationBuildingData, locationData, categoryData, severityData, probabilityData, _suggestionController.text, _rootCauseController.text, _immediateCorrectiveActionController.text, _imageController.text);
+                                    sendDataToDatabase(_observeDescController.text, datetime, departmentData, locationBuildingData, locationData, categoryData, severityData, probabilityData, _suggestionController.text, _rootCauseController.text, _immediateCorrectiveActionController.text, _imageController.text as String);
                                     sendImage();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text('Data berhasil diinput')
-                                      ),
-                                    );
                                     Navigator.push(
                                         context, MaterialPageRoute(builder: (context) => const TableToss()));
                                   } else {
