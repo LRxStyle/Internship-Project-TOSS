@@ -41,6 +41,7 @@ class _TableTossState extends State<TableToss> {
   void initState() {
     super.initState();
     fetchDataFromDatabase();
+    cleanUpOldDeletedData();
   }
 
   Future<void> deleteSelectedRow(int rowIndex) async {

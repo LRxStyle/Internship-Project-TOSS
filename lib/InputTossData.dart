@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:demo_input_toss/TableToss.dart';
+import 'package:demo_input_toss/DeletedDataPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -388,6 +389,7 @@ class _InputTossDataState extends State<InputTossData> {
   @override
   void initState() {
     super.initState();
+    cleanUpOldDeletedData();
     _fetchData();
     _fetchKodeLocation();
     _fetchIDDepartment();

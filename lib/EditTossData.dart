@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:demo_input_toss/TableToss.dart';
+import 'package:demo_input_toss/DeletedDataPage.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -440,6 +441,7 @@ class _EditDataPageState extends State<EditDataPage> {
   @override
   void initState() {
     super.initState();
+    cleanUpOldDeletedData();
     _reportIDController.text = widget.data[1];
     _statusController.text = widget.data[2];
     _observeDescController.text = widget.data[3];

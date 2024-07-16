@@ -2,6 +2,28 @@ import 'package:demo_input_toss/TableToss.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 
+Future<MySqlConnection> _getConnection() async {
+  final settings = ConnectionSettings(
+    host: '10.0.2.2',
+    port: 3306,
+    user: 'root',
+    password: null,
+    db: 'db_pas',
+  );
+
+  return await MySqlConnection.connect(settings);
+}
+
+Future<void> cleanUpOldDeletedData() async {
+  MySqlConnection connection = await _getConnection();
+
+  await connection.query(
+      'DELETE FROM deleted_sor_data WHERE deleted_at < NOW() - INTERVAL 30 DAY'
+  );
+
+  await connection.close();
+}
+
 class DeletedDataPage extends StatefulWidget {
   const DeletedDataPage({Key? key}) : super(key: key);
 
@@ -10,18 +32,6 @@ class DeletedDataPage extends StatefulWidget {
 }
 
 class _DeletedDataPageState extends State<DeletedDataPage> {
-  Future<MySqlConnection> _getConnection() async {
-    final settings = ConnectionSettings(
-      host: '10.0.2.2',
-      port: 3306,
-      user: 'root',
-      password: null,
-      db: 'db_pas',
-    );
-
-    return await MySqlConnection.connect(settings);
-  }
-
   List<List<String>> deletedDataRows = [];
 
   @override
@@ -137,16 +147,6 @@ class _DeletedDataPageState extends State<DeletedDataPage> {
     setState(() {
       deletedDataRows.removeAt(rowIndex);
     });
-  }
-
-  Future<void> cleanUpOldDeletedData() async {
-    MySqlConnection connection = await _getConnection();
-
-    await connection.query(
-        'DELETE FROM deleted_sor_data WHERE deleted_at < NOW() - INTERVAL 30 DAY'
-    );
-
-    await connection.close();
   }
 
   @override
