@@ -45,7 +45,7 @@ class _DeletedDataPageState extends State<DeletedDataPage> {
     MySqlConnection connection = await _getConnection();
 
     final results = await connection.query(
-        'SELECT sor_id, sor_report_id, sor_observe_description, sor_date, sor_department_id, '
+        'SELECT sor_id, sor_report_id, sor_current_status, sor_observe_description, sor_date, sor_department_id, '
             'sor_location_building_id, sor_location_id, sor_safe_category_id, sor_hazard_level, '
             'sor_probabilities, sor_suggestion, sor_root_cause, sor_immediate_corrective_action, '
             'sor_evidence, created_at, deleted_at '
@@ -56,6 +56,7 @@ class _DeletedDataPageState extends State<DeletedDataPage> {
       deletedDataRows.add([
         row['sor_id'].toString(),
         row['sor_report_id'].toString(),
+        row['sor_current_status'].toString(),
         row['sor_observe_description'].toString(),
         row['sor_date'].toIso8601String().split('T').first,
         row['sor_department_id'].toString(),
@@ -85,30 +86,30 @@ class _DeletedDataPageState extends State<DeletedDataPage> {
     DateTime createdAt;
 
     try {
-      sorDate = DateTime.parse(row[3].replaceAll('[', '').replaceAll(']', '').split(',')[0].trim());
+      sorDate = DateTime.parse(row[4].replaceAll('[', '').replaceAll(']', '').split(',')[0].trim());
     } catch (e) {
       print('Error parsing sor_date: $e');
       return;
     }
 
     try {
-      createdAt = DateTime.parse(row[14].replaceAll('[', '').replaceAll(']', '').split(',')[0].trim());
+      createdAt = DateTime.parse(row[15].replaceAll('[', '').replaceAll(']', '').replaceFirst(',', '').replaceAll(', ', '.'));
     } catch (e) {
       print('Error parsing created_at: $e');
       return;
     }
 
     await connection.query(
-        'INSERT INTO ssq_data_sor (sor_id, sor_report_id, sor_observe_description, sor_date, sor_department_id, '
+        'INSERT INTO ssq_data_sor (sor_id, sor_report_id, sor_current_status, sor_observe_description, sor_date, sor_department_id, '
             'sor_location_building_id, sor_location_id, sor_safe_category_id, sor_hazard_level, sor_probabilities, '
             'sor_suggestion, sor_root_cause, sor_immediate_corrective_action, sor_evidence, created_at) '
-            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           row[0],
           row[1],
           row[2],
+          row[3],
           sorDate.toUtc(),
-          row[4],
           row[5],
           row[6],
           row[7],
@@ -118,6 +119,7 @@ class _DeletedDataPageState extends State<DeletedDataPage> {
           row[11],
           row[12],
           row[13],
+          row[14],
           createdAt.toUtc()
         ]
     );
@@ -125,6 +127,10 @@ class _DeletedDataPageState extends State<DeletedDataPage> {
     await connection.query(
         'DELETE FROM deleted_sor_data WHERE sor_id = ?',
         [int.parse(row[0])]
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Data berhasil direstore')),
     );
 
     await connection.close();
@@ -141,6 +147,10 @@ class _DeletedDataPageState extends State<DeletedDataPage> {
     await connection.query(
         'DELETE FROM deleted_sor_data WHERE sor_id = ?',
         [int.parse(row[0])]
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Data berhasil dihapus permanen')),
     );
 
     await connection.close();
@@ -191,10 +201,13 @@ class _DeletedDataPageState extends State<DeletedDataPage> {
           child: Column(
             children: [
               DataTable(
+                columnSpacing: 30,
+                sortAscending: true,
                 columns: [
                   const DataColumn(label: Text('Restore or Delete')),
                   const DataColumn(label: Text('ID')),
                   const DataColumn(label: Text('Report ID')),
+                  const DataColumn(label: Text('Status')),
                   const DataColumn(label: Text('Observe Description')),
                   const DataColumn(label: Text('Date')),
                   const DataColumn(label: Text('Department')),

@@ -415,13 +415,13 @@ class _EditDataPageState extends State<EditDataPage> {
       if (mounted) {
         if (result != null && result.affectedRows != null && result.affectedRows! > 0) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Data updated successfully')),
+            const SnackBar(content: Text('Data berhasil diedit')),
           );
           // Navigate back to the previous screen after successful update
           Navigator.pop(context);
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No data was updated')),
+            const SnackBar(content: Text('Data gagal diedit')),
           );
         }
       }

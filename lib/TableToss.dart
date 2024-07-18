@@ -57,13 +57,14 @@ class _TableTossState extends State<TableToss> {
     if (result.isNotEmpty) {
       var row = result.first;
       await connection.query(
-          'INSERT INTO deleted_sor_data (sor_id, sor_report_id, sor_observe_description, sor_date, sor_department_id, '
+          'INSERT INTO deleted_sor_data (sor_id, sor_report_id, sor_current_status, sor_observe_description, sor_date, sor_department_id, '
               'sor_location_building_id, sor_location_id, sor_safe_category_id, sor_hazard_level, sor_probabilities, '
               'sor_suggestion, sor_root_cause, sor_immediate_corrective_action, sor_evidence, created_at, deleted_at) '
-              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+              'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
           [
             row['sor_id'],
             row['sor_report_id'],
+            row['sor_current_status'],
             row['sor_observe_description'],
             row['sor_date'].toUtc(),
             row['sor_department_id'],
@@ -84,6 +85,10 @@ class _TableTossState extends State<TableToss> {
       await connection.query(
           'DELETE FROM ssq_data_sor WHERE sor_id = ?',
           [idToDelete]
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Data berhasil dihapus')),
       );
 
       setState(() {
@@ -139,6 +144,9 @@ class _TableTossState extends State<TableToss> {
   Future<void> refreshData() async {
     dataRows.clear(); // Clear the existing data
     await fetchDataFromDatabase(); // Fetch data again
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Data berhasil direfresh')),
+    );
   }
 
   Future getSourceIdFromText<T>(String sourceTable, String columnName, String columnName2, String text) async {

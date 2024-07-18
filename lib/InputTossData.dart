@@ -351,7 +351,10 @@ class _InputTossDataState extends State<InputTossData> {
     }
 
     try {
-      await connection.query('INSERT INTO ssq_data_sor (sor_observe_description, sor_date, sor_department_id, sor_location_building_id, sor_location_id, sor_safe_category_id, sor_hazard_level, sor_probabilities, sor_suggestion, sor_root_cause, sor_immediate_corrective_action, sor_evidence, created_at, sor_report_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+      await connection.query('INSERT INTO ssq_data_sor (sor_observe_description, sor_date, '
+          'sor_department_id, sor_location_building_id, sor_location_id, sor_safe_category_id, '
+          'sor_hazard_level, sor_probabilities, sor_suggestion, sor_root_cause, sor_immediate_corrective_action, '
+          'sor_evidence, created_at, sor_report_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
         [
           data1,
           data2.toLocal().toIso8601String().split('T').first,
@@ -365,7 +368,7 @@ class _InputTossDataState extends State<InputTossData> {
           data10,
           data11,
           data12,
-          DateTime.now().toLocal().toIso8601String(),
+          DateTime.now().toUtc(),
           reportName,
         ],);
       print('Data sent successfully!');
