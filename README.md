@@ -3,7 +3,7 @@ The project I and the IT Chief at PAS agreed is to make Input Data TOSS screen(1
 During the gap I already started doing my project before I officially started my internship. 
 When I started my internship I solely doing everything alone. 
 From the design, the algorithm, constructing communication route with database. 
-Then later on my 2nd week(8 August 2023) I have been told to create 2 more screen(Table Data TOSS & Edit Data TOSS) outside of our agreement.
+Then later on my 2nd week of internship(8 August 2023), I have been told to create 2 more screen(Table Data TOSS & Edit Data TOSS) outside of our agreement.
 19 June 2024 I developed another feature(Deleted Data Page) that has been tasked for me by my Internship's lecturer.
 
 This app consist of 4 page or screen :
